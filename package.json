@@ -1,0 +1,28 @@
+{
+  "name": "CoffeeTime",
+  "version": "0.0.1",
+  "description": "Service for connecting people for quick talk by finding space in calendar and creating an event for them",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Google",
+    "Calendar",
+    "coffee"
+  ],
+  "author": "Josef Nevoral",
+  "license": "MIT",
+  "engines": {
+    "node": "0.12.2",
+    "npm": "2.7.4"
+  },
+  "dependencies": {
+    "debug": "^2.1.3",
+    "express": "^4.12.3",
+    "google-calendar": "^1.3.2",
+    "mongodb": "^2.0.27",
+    "oauth": "^0.9.12",
+    "promise": "^7.0.0"
+  }
+}
