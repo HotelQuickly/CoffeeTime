@@ -1,10 +1,10 @@
-var Promise = require("bluebird")
+'use strict'
 
-var oauth = require('oauth')
+// bootstrap the env vars from a file
+// silent prevents log to console on production server where there is
+// no .env file
 
-var mongo = Promise.promisifyAll(require('mongodb'))
-
-var gcal = Promise.promisifyAll(require('google-calendar'))
+require('dotenv').config({silent: true})
 
 
 var app = require('express')(),
