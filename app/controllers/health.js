@@ -1,7 +1,6 @@
 'use strict'
 
 var healthyCheck = function(request, response) {
-    // todo: check database connection?
     response.json({
         ok: true
     })

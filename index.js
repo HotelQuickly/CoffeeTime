@@ -7,9 +7,13 @@
 require('dotenv').config({silent: true})
 
 
-var app = require('express')(),
+var express = require('express'),
     http = require('http'),
     config = require('./config/environment')
+
+var app = express()
+
+require('./config/expressMiddleware')(app, config)
 
 var params = {
     app: app,
@@ -18,6 +22,12 @@ var params = {
         // loggers / helpers / etc
     }
 }
+
+var models = require('./app/models')(params)
+params.models = models
+
+var providers = require('./app/providers')(params)
+params.providers = providers
 
 // boot strap routes
 require('./app/routes')(params)
