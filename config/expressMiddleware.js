@@ -6,16 +6,6 @@ var express = require('express'),
     passport = require('passport'),
     debug = require('debug')('expressMiddleware')
 
-// todo move to routesMiddleware and specify it's usage only for routes that should be secured
-var isAuthenticated = function(request, response, next) {
-    if ( ! request.isAuthenticated()
-        && request.path != '/auth'
-        && request.path != '/auth/callback'
-    ) {
-        return response.redirect('/auth')
-    }
-    next()
-}
 
 module.exports = function(app, config) {
     app.set('views', __dirname + '/../app/views')
@@ -29,9 +19,6 @@ module.exports = function(app, config) {
     }));
     app.use(passport.initialize())
     app.use(passport.session())
-
-    app.use(isAuthenticated)
-
 
     app.use(express.static(__dirname + 'public'))
 }

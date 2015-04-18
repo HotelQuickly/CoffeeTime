@@ -29,6 +29,9 @@ params.models = models
 var providers = require('./app/providers')(params)
 params.providers = providers
 
+var routerMiddleware = require('./app/routes/routeMiddleware')(params)
+params.routerMiddleware = routerMiddleware
+
 // boot strap routes
 require('./app/routes')(params)
 

@@ -6,7 +6,8 @@
  */
 module.exports = function(params) {
     var providers = {
-        Auth: require('./auth').getMethods(params)
+        Auth: require('./auth').getMethods(params),
+        Calendar: require('./calendar').getMethods(params)
     }
 
     for ( var provider in providers ){

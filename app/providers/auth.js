@@ -3,6 +3,8 @@
 var passport = require('passport'),
     debug = require('debug')('coffee:app:providers:auth'),
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+    google = require('googleapis'),
+    refresh = require('passport-oauth2-refresh'),
     config,
     models,
     providers
@@ -21,18 +23,44 @@ passport.deserializeUser(function(userId, done) {
 });
 
 var registerGoogleStrategy = function() {
-    passport.use(new GoogleStrategy({
+    var strategy = new GoogleStrategy({
             clientID: config.consumerKey,
             clientSecret: config.consumerSecret,
-            // read this from
+            // tood: read this from params.conf
             callbackURL: "http://localhost:5000/auth/callback"
         },
         function(accessToken, refreshToken, profile, done) {
-            profile.accessToken = accessToken
-            models.User.findOrCreate(profile)
-            return done(null, profile.id);
+            var userData = {
+                id: profile.id,
+                email: profile.emails[0].value,
+                displayName: profile.displayName,
+                name: profile.name,
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }
+
+            models.User.findOrCreate(userData)
+            return done(null, userData.id);
         }
-    ));
+    )
+
+    passport.use(strategy);
+    refresh.use(strategy);
+}
+
+var refreshUserAccessToken = function(user, callback) {
+    console.log(user)
+    debug('attempting to refresh user token')
+    refresh.requestNewAccessToken('google', user.refreshToken, function(err, accessToken) {
+        debug('refreshed user access token')
+        models.User.findOneAndUpdate({
+                query: { id: user.id },
+                update: { $set: {accessToken: accessToken }},
+                new: true
+            }, function(error, user) {
+                callback(null, accessToken, user);
+        });
+    });
 }
 
 var setProviders = function(providerObject) {
@@ -46,6 +74,7 @@ exports.getMethods = function(params) {
 
     return {
         setProviders: setProviders,
-        registerGoogleStrategy: registerGoogleStrategy
+        registerGoogleStrategy: registerGoogleStrategy,
+        refreshUserAccessToken: refreshUserAccessToken
     }
 }

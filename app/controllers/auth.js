@@ -11,7 +11,13 @@ exports.register = function(params) {
 
     providers.Auth.registerGoogleStrategy(params)
 
-    app.get('/auth', passport.authenticate('google', { scope: ['email', 'https://www.googleapis.com/auth/calendar'] }));
+    var googleAuthParams = {
+        scope: ['email', 'https://www.googleapis.com/auth/calendar'],
+        accessType: 'offline',
+        approvalPrompt: 'force'
+    }
+
+    app.get('/auth', passport.authenticate('google', googleAuthParams));
 
     app.get('/auth/callback', passport.authenticate('google', { failureRedirect: '/login' }), function(request, response) {
         return response.redirect('/');
