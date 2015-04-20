@@ -17,7 +17,8 @@ module.exports = function(params) {
     });
 
     return {
-        User: require('./user').getMethods(mongoConnection.collection('user'))
+        User: require('./user').getMethods(mongoConnection.collection('user')),
+        Event: require('./event').getMethods(mongoConnection.collection('event'))
     }
 }
 

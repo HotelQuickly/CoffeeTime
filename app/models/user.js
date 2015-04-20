@@ -61,8 +61,6 @@ var countUsers = function(query, callback) {
     userCollection.count(query, callback)
 }
 
-var hasUserCoffeeTimePlanned =
-
 exports.getMethods = function(mongoUserCollection) {
     userCollection = mongoUserCollection
 

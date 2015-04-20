@@ -111,7 +111,6 @@ var areUsersFree = function(callback) {
     providers.User.findTwoUniqueUsers(matchFoundUsers)
 }
 
-
 var setProviders = function(providerObject) {
     providers = providerObject
 }

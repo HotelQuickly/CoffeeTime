@@ -29,13 +29,14 @@ var registerGoogleStrategy = function() {
             // tood: read this from params.conf
             callbackURL: "http://localhost:5000/auth/callback"
         },
-        function(accessToken, refreshToken, profile, done) {
+        function(accessToken, refreshToken, params, profile, done) {
             var userData = {
                 id: profile.id,
                 email: profile.emails[0].value,
                 displayName: profile.displayName,
                 name: profile.name,
                 accessToken: accessToken,
+                accessTokenExpiresIn: new Date((new Date()).getTime() + (params.expires_in * 1000)),
                 refreshToken: refreshToken
             }
 
@@ -49,7 +50,10 @@ var registerGoogleStrategy = function() {
 }
 
 var refreshUserAccessToken = function(user, callback) {
-    console.log(user)
+    if (user.accessTokenExpiresIn.getTime() > (new Date()).getTime() + 60000) {
+        return callback && callback(null, user.accessToken, user)
+    }
+
     debug('attempting to refresh user token')
     refresh.requestNewAccessToken('google', user.refreshToken, function(err, accessToken) {
         debug('refreshed user access token')
