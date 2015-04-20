@@ -44,6 +44,24 @@ var findOneAndUpdate = function(options, callback) {
     })
 }
 
+var random = function(count) {
+    return Math.floor( Math.random() * count )
+}
+
+var findRandomUser = function(userCount, callback) {
+    debug('Trying to find random user from %d users', userCount)
+    if ( ! userCount) {
+        userCount = 1
+    }
+
+    userCollection.find().limit(-1).skip(random(userCount)).next(callback)
+}
+
+var countUsers = function(query, callback) {
+    userCollection.count(query, callback)
+}
+
+var hasUserCoffeeTimePlanned =
 
 exports.getMethods = function(mongoUserCollection) {
     userCollection = mongoUserCollection
@@ -53,6 +71,8 @@ exports.getMethods = function(mongoUserCollection) {
         findById: findById,
         findAll: findAll,
         update: userCollection.update,
-        findOneAndUpdate: findOneAndUpdate
+        findOneAndUpdate: findOneAndUpdate,
+        findRandomUser: findRandomUser,
+        countUsers: countUsers
     }
 };

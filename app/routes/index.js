@@ -6,10 +6,11 @@ module.exports = function(params) {
     app.get('/', function(request, response) {
         response.redirect('/users/list')
     })
+
     // require controllers and have them register routes with the express app
     require('../controllers/health').register(params)
     require('../controllers/auth').register(params)
-    require('../controllers/calendar/list').register(params)
+    require('../controllers/calendar').register(params)
     require('../controllers/user').register(params)
 
 }

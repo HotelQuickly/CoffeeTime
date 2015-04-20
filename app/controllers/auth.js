@@ -4,6 +4,16 @@ var passport = require('passport'),
     providers,
     config
 
+var login = function(request, response) {
+    response.render('auth/login.jade')
+}
+
+var logout = function(request, response) {
+    request.logout()
+    response.redirect('/')
+}
+
+
 exports.register = function(params) {
     var app = params.app
     config = params.config
@@ -23,5 +33,7 @@ exports.register = function(params) {
         return response.redirect('/');
     });
 
+    app.get('/logout', logout)
+    app.get('/login', login)
 }
 

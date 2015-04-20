@@ -2,10 +2,11 @@
 var debug = require('debug')('coffee:app:providers:calendar'),
     googleCalendar = require('google-calendar'),
     async = require('async'),
+    datejs = require('datejs'),
     config,
     models,
-    providers
-
+    providers,
+    usersFreeTime = [] // for caching results from google calendar API
 
 var filterUserCompanyCalendar = function(calendars, userEmail) {
     return calendars.filter(function(item) {
@@ -18,33 +19,98 @@ var getListOfCalendars = function(userAccessToken, userData, callback) {
 
     googleCalendar(userAccessToken).calendarList.list(function(error, data) {
         debug('callback after getting list of calendars')
+        if (error) {
+            return callback && callback(error)
+        }
         callback && callback(null, userAccessToken, filterUserCompanyCalendar(data.items, userData.email))
     })
 }
 
-var getIfUserIsBusy = function(userAccessToken, data, callback) {
-    debug('getting info is user is busy')
+var getIfUserIsFree = function(userAccessToken, data, callback) {
+    debug('getting info if user is free')
 
-    debug('test')
-    debug('what about now')
+    if (usersFreeTime[userAccessToken]) {
+        return callback && callback(null, usersFreeTime[userAccessToken])
+    }
+
     var query = {
-        timeMin: new Date("2015-04-23T09:00:00"),
-        timeMax: new Date("2015-04-23T13:00:00"),
+        // todo: find a way how to define it in configuration
+        timeMin: new Date(Date.parse("next wednesday ").setHours(16, 0, 0)),
+        timeMax: new Date(Date.parse("next wednesday ").setHours(16, 30, 0)),
+        timeZone: 'Asia/Bangkok',
         items: data
     }
 
-    googleCalendar(userAccessToken).freebusy.query(query, {}, callback)
+    googleCalendar(userAccessToken).freebusy.query(query, {}, function(error, data) {
+        debug('got response about user busyness')
+
+        if (error) {
+            return callback && callback(error)
+        }
+        /**
+         * data are in format
+         * {
+         *      calendars: {[
+         *          josef.nevoral@hotelquickly.com: {
+         *              busy: [
+         *                  timeStart: "2015-04-24 17:00:00"
+         *                  timeEnd: "2015-04-24 17:30:00"
+         *              ]
+                 *  }
+         *      ]}
+         * }
+         */
+        var busyTimes = data.calendars[Object.keys(data.calendars)[0]].busy
+
+        if (busyTimes.length > 0) {
+            usersFreeTime[userAccessToken] = false
+            return callback && callback(null, false)
+        }
+
+        usersFreeTime[userAccessToken] = true
+        callback(null, true)
+    })
 }
 
-var isUserBusy = function(userId, callback) {
+var isUserFree = function(userId, callback) {
 
     async.waterfall([
         async.apply(models.User.findById, userId),
         providers.Auth.refreshUserAccessToken,
         getListOfCalendars,
-        getIfUserIsBusy
+        getIfUserIsFree
     ], callback)
 }
+
+
+var areUsersFree = function(callback) {
+
+    var matchFoundUsers = function(error, userOne, userTwo) {
+        if (error) {
+            return callback && callback(error)
+        }
+
+        async.parallel({
+            userOneIsFree: async.apply(isUserFree, userOne.id),
+            userTwoIsFree: async.apply(isUserFree, userTwo.id)
+        }, function(error, result) {
+            if (error) {
+                return callback && callback(error)
+            }
+
+            var returnResult = {
+                userOne: userOne,
+                userTwo: userTwo,
+                areUsersFree: result.userOneIsFree && result.userTwoIsFree
+            }
+
+            callback(null, returnResult)
+        })
+    }
+
+    providers.User.findTwoUniqueUsers(matchFoundUsers)
+}
+
 
 var setProviders = function(providerObject) {
     providers = providerObject
@@ -57,6 +123,7 @@ exports.getMethods = function(params) {
 
     return {
         setProviders: setProviders,
-        isUserBusy: isUserBusy
+        isUserFree: isUserFree,
+        areUsersFree: areUsersFree
     }
 }

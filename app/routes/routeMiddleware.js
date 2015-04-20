@@ -4,7 +4,7 @@ var debug = require('debug')('coffee:middleware:base')
 
 var isAuthenticated = function(request, response, next) {
     if ( ! request.isAuthenticated()) {
-        return response.redirect('/auth')
+        return response.redirect('/login')
     }
     next()
 }

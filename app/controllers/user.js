@@ -17,6 +17,6 @@ exports.register = function(params) {
     var routeMiddleware = params.routerMiddleware
     models = params.models
 
-    app.get('/users/list'/*, routeMiddleware.isAuthenticated*/, userList)
+    app.get('/users/list', routeMiddleware.isAuthenticated, userList)
 }
 
