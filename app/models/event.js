@@ -4,16 +4,27 @@ var debug = require('debug')('coffee:app:models:event'),
     eventCollection,
     log
 
-
-var hasUserPlannedEvent = function(userId, date, callback) {
-    eventCollection.find({ $or: [
-        {
-            userOneId: userId
+var hasUserPlannedEvent = function(userEmail, startDateTime, endDateTime, callback) {
+    debug('checking if user has already some event planned')
+    var query = {
+        attendees: {
+            $elemMatch: {
+                email: userEmail
+            }
         },
-        {
-            userTwoId: userId
+        start: {
+            dateTime: startDateTime.format()
+        },
+        end: {
+            dateTime: endDateTime.format()
         }
-    ]}, callback)
+    }
+    console.log(query)
+    eventCollection.find(query, callback)
+}
+
+var save = function(event, callback) {
+    eventCollection.save(event, callback)
 }
 
 exports.getMethods = function(params, mongoEventCollection) {
@@ -21,6 +32,7 @@ exports.getMethods = function(params, mongoEventCollection) {
     log = params.utils.log
 
     return {
-        hasUserPlannedEvent: hasUserPlannedEvent
+        hasUserPlannedEvent: hasUserPlannedEvent,
+        save: save
     }
 };

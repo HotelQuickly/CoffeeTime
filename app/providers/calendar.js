@@ -1,12 +1,11 @@
 'use strict'
-var debug = require('debug')('coffee:app:providers:calendar'),
+var debug = require('debug')('coffee:providers:calendar'),
     googleCalendar = require('google-calendar'),
     async = require('async'),
     moment = require('moment'),
     config,
     models,
-    providers,
-    usersFreeTime = [] // for caching results from google calendar API
+    providers
 
 // todo: define the times from configuration
 var startDateTime = moment().add(2, 'days').hours(7).minutes(0).utcOffset(7),
@@ -27,16 +26,12 @@ var getListOfCalendars = function(userAccessToken, userData, callback) {
         if (error) {
             return callback && callback(error)
         }
-        callback && callback(null, userAccessToken, filterUserCompanyCalendar(calendars.items, userData.email))
+        callback && callback(null, userAccessToken, userData.email, filterUserCompanyCalendar(calendars.items, userData.email))
     })
 }
 
-var getIfUserIsFree = function(userAccessToken, calendars, callback) {
+var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) {
     debug('getting info if user is free')
-
-    if (usersFreeTime[userAccessToken]) {
-        return callback && callback(null, usersFreeTime[userAccessToken])
-    }
 
     var query = {
         timeMin: startDateTime,
@@ -46,7 +41,7 @@ var getIfUserIsFree = function(userAccessToken, calendars, callback) {
     }
 
     googleCalendar(userAccessToken).freebusy.query(query, {}, function(error, data) {
-        debug('got response about user busyness')
+        debug('got response about user busyness', userEmail)
 
         if (error) {
             return callback && callback(error)
@@ -67,23 +62,35 @@ var getIfUserIsFree = function(userAccessToken, calendars, callback) {
         var busyTimes = data.calendars[Object.keys(data.calendars)[0]].busy
 
         if (busyTimes.length > 0) {
-            usersFreeTime[userAccessToken] = false
             return callback && callback(null, false)
         }
 
-        usersFreeTime[userAccessToken] = true
-        callback(null, true)
+        providers.Event.hasUserPlannedEvent(userEmail, startDateTime, endDateTime, function(error, events) {
+            debug('got users planned events')
+            if (error) {
+                return callback && callback(error)
+            }
+
+            console.log('event are', events)
+
+            if (events && events.length > 0) {
+                return callback && callback(null, false)
+            } else {
+                return callback && callback(null, true)
+            }
+        })
     })
 }
 
 var isUserFree = function(userId, callback) {
-
     async.waterfall([
         async.apply(models.User.findById, userId),
         providers.Auth.refreshUserAccessToken,
         getListOfCalendars,
         getIfUserIsFree
-    ], callback)
+    ], function(error, result) {
+        callback(error, result)
+    })
 }
 
 
@@ -115,42 +122,47 @@ var areUsersFree = function(callback) {
 }
 
 // todo: where to put this helper functions?
-// filters array of attendees to skip "organizer" of event and formats the result to
-// [ { email: userEmail} ]
-var filterAttendeesEmails = function(attendees, userEmail) {
+var getAttendeesEmails = function(attendees, userEmail) {
     return attendees.map(function(attendee) {
-        if (attendee.email !== userEmail) {
-            return { email: attendee.email }
-        }
+        return { email: attendee.email }
     })
 }
 
-var createEvent = function(userAccessToken, userEmail, attendees, start, end, callback) {
+var createEvent = function(organiserAccessToken, organiserEmail, attendees, start, end, callback) {
+    debug('creating event')
+
     var event = {
         summary: 'HQ - CoffeeTime meeting',
         start: { dateTime: startDateTime.format() },
         end: { dateTime: endDateTime.format() },
-        attendees: filterAttendeesEmails(attendees, userEmail),
+        attendees: getAttendeesEmails(attendees),
+        // todo: define proper content
         description: 'We will meet and discuss life and stuff'
     }
 
-    console.log('sending event to ', userEmail, event)
-
-    googleCalendar(userAccessToken).events.insert(userEmail, event, function(error, result) {
+    googleCalendar(organiserAccessToken).events.insert(organiserEmail, event, function(error, result) {
         if (error) {
             return callback && callback(error)
         }
+
+        providers.Event.saveFromGoogleEventInsertData(result)
 
         return callback && callback(null, result)
     })
 }
 
-var createEventsForAttendees = function(attendees, callback) {
+var createEventsForAttendees = function(organiserData, attendees, callback) {
     if (attendees.length < 2) {
         callback('There has to be at least 2 attendees for an event')
     }
 
-    createEvent(attendees[0].accessToken, attendees[0].email, attendees, startDateTime, endDateTime, callback)
+    providers.Auth.refreshUserAccessToken(organiserData, function(error, organiserAccessToken) {
+        if (error) {
+            return callback && callback(error)
+        }
+        createEvent(organiserAccessToken, organiserData.email, attendees, startDateTime, endDateTime, callback)
+    })
+
 }
 
 

@@ -8,7 +8,8 @@ module.exports = (function() {
         sessionSecret: process.env.SESSION_SECRET || 'HQ rocks',
         consumerKey: process.env.GOOGLE_CONSUMER_KEY,
         consumerSecret: process.env.GOOGLE_CONSUMER_SECRET,
-        mongoUri: process.env.MONGO_URI
+        mongoUri: process.env.MONGO_URI,
+        eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL
     }
 })()
 

@@ -1,5 +1,5 @@
 'use strict'
-var debug = require('debug')('coffee:app:providers:user'),
+var debug = require('debug')('coffee:providers:user'),
     async = require('async'),
     config,
     models,
@@ -30,7 +30,7 @@ var findRandomUniqueUser = function(alreadyFoundUser, callback) {
         })
     }
 
-    models.User.countUsers({}, findRandomUser)
+    models.User.countUsers({email: { $ne: config.eventOrganiserEmail}}, findRandomUser)
 }
 
 var findTwoUniqueUsers = function(mainCallback) {
@@ -51,9 +51,6 @@ var findTwoUniqueUsers = function(mainCallback) {
 
         userTwo = user
 
-        console.log('userOne is', userOne)
-        console.log('userTow is', userTwo)
-
         mainCallback(null, userOne, userTwo)
     })
 }
@@ -69,6 +66,7 @@ exports.getMethods = function(params) {
 
     return {
         setProviders: setProviders,
-        findTwoUniqueUsers: findTwoUniqueUsers
+        findTwoUniqueUsers: findTwoUniqueUsers,
+        findByEmail: models.User.findByEmail
     }
 }

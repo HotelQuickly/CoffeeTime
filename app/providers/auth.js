@@ -1,10 +1,11 @@
 'use strict'
 
 var passport = require('passport'),
-    debug = require('debug')('coffee:app:providers:auth'),
+    debug = require('debug')('coffee:providers:auth'),
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
     google = require('googleapis'),
     refresh = require('passport-oauth2-refresh'),
+    moment = require('moment'),
     config,
     models,
     providers
@@ -22,6 +23,10 @@ passport.deserializeUser(function(userId, done) {
     })
 });
 
+var calculateAccessTokenExpiration = function(expiresIn) {
+    return new Date((new Date()).getTime() + (expiresIn * 1000))
+}
+
 var registerGoogleStrategy = function() {
     var strategy = new GoogleStrategy({
             clientID: config.consumerKey,
@@ -35,7 +40,7 @@ var registerGoogleStrategy = function() {
                 displayName: profile.displayName,
                 name: profile.name,
                 accessToken: accessToken,
-                accessTokenExpiresIn: new Date((new Date()).getTime() + (params.expires_in * 1000)),
+                accessTokenExpiresIn: calculateAccessTokenExpiration(params.expires_in),
                 refreshToken: refreshToken
             }
 
@@ -49,16 +54,19 @@ var registerGoogleStrategy = function() {
 }
 
 var refreshUserAccessToken = function(user, callback) {
-    if (user.accessTokenExpiresIn.getTime() > (new Date()).getTime() + 60000) {
+    if ((new Date(user.accessTokenExpiresIn)).getTime() > (new Date()).getTime() + 60000) {
         return callback && callback(null, user.accessToken, user)
     }
 
     debug('attempting to refresh user token')
-    refresh.requestNewAccessToken('google', user.refreshToken, function(err, accessToken) {
+    refresh.requestNewAccessToken('google', user.refreshToken, function(err, accessToken, params) {
         debug('refreshed user access token')
         models.User.findOneAndUpdate({
                 query: { id: user.id },
-                update: { $set: {accessToken: accessToken }},
+                update: { $set: {
+                    accessToken: accessToken,
+                    accessTokenExpiresIn: moment().add(1, 'hour').format()
+                }},
                 new: true
             }, function(error, user) {
                 callback(null, accessToken, user);

@@ -1,7 +1,8 @@
 'use strict'
 
 var userCollection,
-    debug = require('debug')('coffee:app:models:user'),
+    debug = require('debug')('coffee:models:user'),
+    config,
     log
 
 var findAll = function(callback) {
@@ -12,6 +13,10 @@ var findAll = function(callback) {
 
 var findById = function(userId, callback) {
     userCollection.findOne({id: userId}, callback)
+}
+
+var findByEmail = function(email, callback) {
+    userCollection.findOne({email: email}, callback)
 }
 
 var findOrCreate = function(userData, callback) {
@@ -55,20 +60,23 @@ var findRandomUser = function(userCount, callback) {
         userCount = 1
     }
 
-    userCollection.find().limit(-1).skip(random(userCount)).next(callback)
+    userCollection.find({ email: { $ne: config.eventOrganiserEmail }}).limit(-1).skip(random(userCount)).next(callback)
 }
 
 var countUsers = function(query, callback) {
+    console.log(query)
     userCollection.count(query, callback)
 }
 
 exports.getMethods = function(params, mongoUserCollection) {
     userCollection = mongoUserCollection
+    config = params.config
     log = params.utils.log
 
     return {
         findOrCreate: findOrCreate,
         findById: findById,
+        findByEmail: findByEmail,
         findAll: findAll,
         update: userCollection.update,
         findOneAndUpdate: findOneAndUpdate,
