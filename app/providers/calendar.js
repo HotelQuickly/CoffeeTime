@@ -127,10 +127,11 @@ var filterAttendeesEmails = function(attendees, userEmail) {
 
 var createEvent = function(userAccessToken, userEmail, attendees, start, end, callback) {
     var event = {
-        summary: 'CoffeeTime meeting between two of us',
+        summary: 'HQ - CoffeeTime meeting',
         start: { dateTime: "2015-04-22T07:00:00.000Z"/*start*/ },
         end: { dateTime: "2015-04-22T07:30:00.000Z"/*end*/ },
-        attendees: filterAttendeesEmails(attendees, userEmail)
+        attendees: filterAttendeesEmails(attendees, userEmail),
+        description: 'We will meet and discuss life and stuff'
     }
 
     console.log('sending event to ', userEmail, event)

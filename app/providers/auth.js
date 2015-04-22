@@ -26,8 +26,7 @@ var registerGoogleStrategy = function() {
     var strategy = new GoogleStrategy({
             clientID: config.consumerKey,
             clientSecret: config.consumerSecret,
-            // tood: read this from params.conf
-            callbackURL: "http://localhost:5000/auth/callback"
+            callbackURL: config.baseUrl + "/auth/callback"
         },
         function(accessToken, refreshToken, params, profile, done) {
             var userData = {
