@@ -12,6 +12,22 @@ var planCoffeeTimeForRandomUsers = function(request, response) {
 
         // log the event to mongo for this 2 users
 
+        if (result.areUsersFree) {
+            providers.Calendar.createEventsForAttendees(result.users, function(error, createEventsResult) {
+                response.json({
+                    error: error,
+                    result: createEventsResult
+                })
+            })
+
+        } else {
+            response.json('They are not free')
+        }
+    })
+}
+
+var areUsersBusy = function(request, response) {
+    providers.Calendar.areUsersFree(function(error, result) {
         response.json({areUsersFree: result})
     })
 }
@@ -21,6 +37,7 @@ exports.register = function(params) {
     var routeMiddleware = params.routerMiddleware
     providers = params.providers
 
-    app.get('/calendar/'/*, routeMiddleware.isAuthenticated*/, planCoffeeTimeForRandomUsers)
+    app.get('/calendar/'/*, routeMiddleware.isAuthenticated*/, areUsersBusy)
 
+    app.get('/calendar/match', planCoffeeTimeForRandomUsers)
 }

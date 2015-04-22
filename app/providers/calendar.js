@@ -8,6 +8,11 @@ var debug = require('debug')('coffee:app:providers:calendar'),
     providers,
     usersFreeTime = [] // for caching results from google calendar API
 
+// todo: find a way how to define it in configuration
+var startDateTime = new Date(Date.parse("next wednesday ").setHours(7, 0, 0)),
+    endDateTime = new Date(Date.parse("next wednesday ").setHours(7, 30, 0))
+
+
 var filterUserCompanyCalendar = function(calendars, userEmail) {
     return calendars.filter(function(item) {
         return item.id === userEmail
@@ -17,16 +22,16 @@ var filterUserCompanyCalendar = function(calendars, userEmail) {
 var getListOfCalendars = function(userAccessToken, userData, callback) {
     debug('getting list of calendars')
 
-    googleCalendar(userAccessToken).calendarList.list(function(error, data) {
+    googleCalendar(userAccessToken).calendarList.list(function(error, calendars) {
         debug('callback after getting list of calendars')
         if (error) {
             return callback && callback(error)
         }
-        callback && callback(null, userAccessToken, filterUserCompanyCalendar(data.items, userData.email))
+        callback && callback(null, userAccessToken, filterUserCompanyCalendar(calendars.items, userData.email))
     })
 }
 
-var getIfUserIsFree = function(userAccessToken, data, callback) {
+var getIfUserIsFree = function(userAccessToken, calendars, callback) {
     debug('getting info if user is free')
 
     if (usersFreeTime[userAccessToken]) {
@@ -34,11 +39,10 @@ var getIfUserIsFree = function(userAccessToken, data, callback) {
     }
 
     var query = {
-        // todo: find a way how to define it in configuration
-        timeMin: new Date(Date.parse("next wednesday ").setHours(16, 0, 0)),
-        timeMax: new Date(Date.parse("next wednesday ").setHours(16, 30, 0)),
+        timeMin: startDateTime,
+        timeMax: endDateTime,
         timeZone: 'Asia/Bangkok',
-        items: data
+        items: calendars
     }
 
     googleCalendar(userAccessToken).freebusy.query(query, {}, function(error, data) {
@@ -99,8 +103,7 @@ var areUsersFree = function(callback) {
             }
 
             var returnResult = {
-                userOne: userOne,
-                userTwo: userTwo,
+                users: [userOne, userTwo],
                 areUsersFree: result.userOneIsFree && result.userTwoIsFree
             }
 
@@ -110,6 +113,45 @@ var areUsersFree = function(callback) {
 
     providers.User.findTwoUniqueUsers(matchFoundUsers)
 }
+
+// todo: where to put this helper functions?
+// filters array of attendees to skip "organizer" of event and formats the result to
+// [ { email: userEmail} ]
+var filterAttendeesEmails = function(attendees, userEmail) {
+    return attendees.map(function(attendee) {
+        if (attendee.email !== userEmail) {
+            return { email: attendee.email }
+        }
+    })
+}
+
+var createEvent = function(userAccessToken, userEmail, attendees, start, end, callback) {
+    var event = {
+        summary: 'CoffeeTime meeting between two of us',
+        start: { dateTime: "2015-04-22T07:00:00.000Z"/*start*/ },
+        end: { dateTime: "2015-04-22T07:30:00.000Z"/*end*/ },
+        attendees: filterAttendeesEmails(attendees, userEmail)
+    }
+
+    console.log('sending event to ', userEmail, event)
+
+    googleCalendar(userAccessToken).events.insert(userEmail, event, function(error, result) {
+        if (error) {
+            return callback && callback(error)
+        }
+
+        return callback && callback(null, result)
+    })
+}
+
+var createEventsForAttendees = function(attendees, callback) {
+    if (attendees.length < 2) {
+        callback('There has to be at least 2 attendees for an event')
+    }
+
+    createEvent(attendees[0].accessToken, attendees[0].email, attendees, startDateTime, endDateTime, callback)
+}
+
 
 var setProviders = function(providerObject) {
     providers = providerObject
@@ -123,6 +165,7 @@ exports.getMethods = function(params) {
     return {
         setProviders: setProviders,
         isUserFree: isUserFree,
-        areUsersFree: areUsersFree
+        areUsersFree: areUsersFree,
+        createEventsForAttendees: createEventsForAttendees
     }
 }
