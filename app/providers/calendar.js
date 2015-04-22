@@ -2,15 +2,15 @@
 var debug = require('debug')('coffee:app:providers:calendar'),
     googleCalendar = require('google-calendar'),
     async = require('async'),
-    datejs = require('datejs'),
+    moment = require('moment'),
     config,
     models,
     providers,
     usersFreeTime = [] // for caching results from google calendar API
 
-// todo: find a way how to define it in configuration
-var startDateTime = new Date(Date.parse("next wednesday ").setHours(7, 0, 0)),
-    endDateTime = new Date(Date.parse("next wednesday ").setHours(7, 30, 0))
+// todo: define the times from configuration
+var startDateTime = moment().add(2, 'days').hours(7).minutes(0).utcOffset(7),
+    endDateTime = moment().add(2, 'days').hours(7).minutes(30).utcOffset(7)
 
 
 var filterUserCompanyCalendar = function(calendars, userEmail) {
@@ -128,8 +128,8 @@ var filterAttendeesEmails = function(attendees, userEmail) {
 var createEvent = function(userAccessToken, userEmail, attendees, start, end, callback) {
     var event = {
         summary: 'HQ - CoffeeTime meeting',
-        start: { dateTime: "2015-04-22T07:00:00.000Z"/*start*/ },
-        end: { dateTime: "2015-04-22T07:30:00.000Z"/*end*/ },
+        start: { dateTime: startDateTime.format() },
+        end: { dateTime: endDateTime.format() },
         attendees: filterAttendeesEmails(attendees, userEmail),
         description: 'We will meet and discuss life and stuff'
     }
