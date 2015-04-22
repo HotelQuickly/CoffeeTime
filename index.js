@@ -5,7 +5,10 @@
 // no .env file
 
 require('dotenv').config({silent: true})
-
+var logentries = require('node-logentries')
+var log = logentries.logger({
+    token: process.env.LOGENTRIES_TOKEN || '1a4a18f3-c0c2-40c7-9253-4a563032b5f3'
+})
 
 var express = require('express'),
     http = require('http'),
@@ -20,6 +23,7 @@ var params = {
     config: config,
     utils: {
         // loggers / helpers / etc
+        log: log
     }
 }
 

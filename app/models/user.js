@@ -1,7 +1,8 @@
 'use strict'
 
 var userCollection,
-    debug = require('debug')('coffee:app:models:user')
+    debug = require('debug')('coffee:app:models:user'),
+    log
 
 var findAll = function(callback) {
     userCollection.find({}).sort({'name.familyName': 1}).toArray(function(error, results) {
@@ -16,7 +17,7 @@ var findById = function(userId, callback) {
 var findOrCreate = function(userData, callback) {
     var insertOrUpdateUserCallback = function (error, user) {
         if (error) {
-            // todo: log to log management system
+            log.err('storage', error)
             return callback && callback(error)
         }
 
@@ -61,8 +62,9 @@ var countUsers = function(query, callback) {
     userCollection.count(query, callback)
 }
 
-exports.getMethods = function(mongoUserCollection) {
+exports.getMethods = function(params, mongoUserCollection) {
     userCollection = mongoUserCollection
+    log = params.utils.log
 
     return {
         findOrCreate: findOrCreate,

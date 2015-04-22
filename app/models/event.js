@@ -1,7 +1,8 @@
 'use strict'
 
 var debug = require('debug')('coffee:app:models:event'),
-    eventCollection
+    eventCollection,
+    log
 
 
 var hasUserPlannedEvent = function(userId, date, callback) {
@@ -15,8 +16,9 @@ var hasUserPlannedEvent = function(userId, date, callback) {
     ]}, callback)
 }
 
-exports.getMethods = function(mongoEventCollection) {
+exports.getMethods = function(params, mongoEventCollection) {
     eventCollection = mongoEventCollection
+    log = params.utils.log
 
     return {
         hasUserPlannedEvent: hasUserPlannedEvent
