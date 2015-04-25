@@ -8,8 +8,8 @@ var debug = require('debug')('coffee:providers:calendar'),
     providers
 
 // todo: define the times from configuration
-var startDateTime = moment().add(2, 'days').hours(7).minutes(0).utcOffset(7),
-    endDateTime = moment().add(2, 'days').hours(7).minutes(30).utcOffset(7)
+var startDateTime = moment().add(2, 'days').hours(7).minutes(0).seconds(0).utcOffset(7),
+    endDateTime = moment().add(2, 'days').hours(7).minutes(30).seconds(0).utcOffset(7)
 
 
 var filterUserCompanyCalendar = function(calendars, userEmail) {
@@ -71,8 +71,6 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
                 return callback && callback(error)
             }
 
-            console.log('event are', events)
-
             if (events && events.length > 0) {
                 return callback && callback(null, false)
             } else {
@@ -122,7 +120,7 @@ var areUsersFree = function(callback) {
 }
 
 // todo: where to put this helper functions?
-var getAttendeesEmails = function(attendees, userEmail) {
+var getAttendeesEmails = function(attendees) {
     return attendees.map(function(attendee) {
         return { email: attendee.email }
     })

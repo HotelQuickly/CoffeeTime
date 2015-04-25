@@ -64,7 +64,6 @@ var findRandomUser = function(userCount, callback) {
 }
 
 var countUsers = function(query, callback) {
-    console.log(query)
     userCollection.count(query, callback)
 }
 

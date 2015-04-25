@@ -19,7 +19,6 @@ var hasUserPlannedEvent = function(userEmail, startDateTime, endDateTime, callba
             dateTime: endDateTime.format()
         }
     }
-    console.log(query)
     eventCollection.find(query, callback)
 }
 
