@@ -11,6 +11,10 @@ module.exports = function(app, config) {
     app.set('views', __dirname + '/../app/views')
     app.set('view engine', 'jade')
 
+    app.use(express.static(__dirname + '/../'))
+    app.use(express.static(__dirname + '/../public/'))
+
+
     app.use(session({
         secret: config.sessionSecret,
         store: new MongoStore({
@@ -19,6 +23,4 @@ module.exports = function(app, config) {
     }));
     app.use(passport.initialize())
     app.use(passport.session())
-
-    app.use(express.static(__dirname + 'public'))
 }

@@ -7,7 +7,6 @@ var userList = function(request, response) {
         var locals = {
             users: results
         }
-console.log(locals)
         response.render('user/list.jade', locals)
     })
 }

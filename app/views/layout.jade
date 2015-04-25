@@ -1,7 +1,18 @@
-doctype html
+doctype html5
 html
     head
         title= title
+        link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/bower_components/components-font-awesome/css/font-awesome.min.css')
+        link(rel='stylesheet', href='/bower_components/bootstrap-social/bootstrap-social.css')
+        link(rel='stylesheet', href='/css/stylesheet.css')
+        script(src='/bower_components/jquery/dist/jquery.min.js')
+        script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
     body
-        a(href="/logout") Logout
+        nav.navbar.navbar-default
+            div.container-fluid
+                ul.nav.navbar-nav.navbar-right
+                    li
+                        a(href="/logout") Logout
+
         block content

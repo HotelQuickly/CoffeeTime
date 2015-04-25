@@ -1,6 +1,9 @@
 extends ../layout
 block content
-   h1 CoffeeTime
-   p. Meet with other people in company to chat
+   div.container
+      form.form-signin.well
 
-   a(href="/auth") Login with your company google account
+         h1 CoffeeTime
+         p Meet with other people in company to chat
+
+         #[a.btn-google.btn-lg.btn-social.btn-block(href="/auth") #[i.fa.fa-google] Login with your company google account]

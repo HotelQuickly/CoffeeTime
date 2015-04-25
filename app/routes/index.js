@@ -3,6 +3,7 @@ var debug = require('debug')('coffee:routes:index')
 
 module.exports = function(params) {
     var app = params.app
+
     app.get('/', function(request, response) {
         response.redirect('/users/list')
     })

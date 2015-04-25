@@ -1,6 +1,23 @@
 extends layout
 block content
-   h1= title
-   ul
-        for item in events
-            li= item
+    div.top
+        h1= title
+        ul
+            for item in events
+                li= item
+    div.container
+        div.content
+            table.table.table-striped
+                thead
+                    tr
+                        th Table
+                        th Heading
+                tbody
+                    tr
+                        td Blah
+                        td Test
+                    tr
+                        td Hello
+                        td World
+
+    div.footer
