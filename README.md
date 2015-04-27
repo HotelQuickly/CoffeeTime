@@ -12,6 +12,5 @@ Todo list:
 * ~~add function that will find free spots in calendars for 2 random people~~
 * ~~sent calendar invite with explanation to these 2 people~~
 * ~~save planned events to storage~~
-* load in loop all available users and plan meetings for them
+* ~~load in loop all available users and plan meetings for them~~
 * add installation and usage guide to readme
-* restrict signin to only whitelisted domains

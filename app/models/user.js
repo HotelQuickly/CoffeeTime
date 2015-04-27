@@ -6,7 +6,7 @@ var userCollection,
     log
 
 var findAll = function(callback) {
-    userCollection.find({}).sort({'name.familyName': 1}).toArray(function(error, results) {
+    userCollection.find({ email: { $ne: config.eventOrganiserEmail }}).sort({'name.familyName': 1}).toArray(function(error, results) {
         return callback && callback(null, results)
     })
 }

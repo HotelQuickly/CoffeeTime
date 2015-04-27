@@ -119,7 +119,7 @@ var areUsersFree = function(callback) {
     providers.User.findTwoUniqueUsers(matchFoundUsers)
 }
 
-// todo: where to put this helper functions?
+// todo: move this to utils
 var getAttendeesEmails = function(attendees) {
     return attendees.map(function(attendee) {
         return { email: attendee.email }
