@@ -134,9 +134,9 @@ var createEvent = function(organiserAccessToken, organiserEmail, attendees, star
         start: { dateTime: startDateTime.format() },
         end: { dateTime: endDateTime.format() },
         attendees: getAttendeesEmails(attendees),
-        description: "Friendly chat about work, life and stuff.\n\n Make sure you get to know each other. " +
-            "After the chat please fill out the other person profile in confluence (if he does not have one already).\n" +
-            "Take a look at already created ones e.g. http://confluence.hotelquickly.com/display/TEAM/Chris+Schalkx"
+        description: "Let's get to know each other.  We can chat about life, work or favourite coffee.\n\n " +
+            "During the chat please fill out the other person's profile in Confluence (if it doesn't exist already).\n" +
+            "Example: http://confluence.hotelquickly.com/display/TEAM/Chris+Schalkx"
     }
 
     googleCalendar(organiserAccessToken).events.insert(organiserEmail, event, function(error, result) {
