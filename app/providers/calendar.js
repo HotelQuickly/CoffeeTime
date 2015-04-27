@@ -130,12 +130,13 @@ var createEvent = function(organiserAccessToken, organiserEmail, attendees, star
     debug('creating event')
 
     var event = {
-        summary: 'HQ - CoffeeTime meeting',
+        summary: 'CoffeeTime - chat with a colleague',
         start: { dateTime: startDateTime.format() },
         end: { dateTime: endDateTime.format() },
         attendees: getAttendeesEmails(attendees),
-        // todo: define proper content
-        description: 'We will meet and discuss life and stuff'
+        description: "Friendly chat about work, life and stuff.\n\n Make sure you get to know each other. " +
+            "After the chat please fill out the other person profile in confluence (if he does not have one already).\n" +
+            "Take a look at already created ones e.g. http://confluence.hotelquickly.com/display/TEAM/Chris+Schalkx"
     }
 
     googleCalendar(organiserAccessToken).events.insert(organiserEmail, event, function(error, result) {
