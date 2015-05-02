@@ -27,6 +27,6 @@ exports.register = function(params) {
     providers = params.providers
     utils = params.utils
 
-    app.get('/home', routeMiddleware.isAuthenticated, eventList)
+    app.get('/', routeMiddleware.isAuthenticated, eventList)
 }
 
