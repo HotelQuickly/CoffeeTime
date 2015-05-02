@@ -3,13 +3,14 @@ var debug = require('debug')('coffee:providers:user'),
     async = require('async'),
     config,
     models,
-    providers
+    providers,
+    usersWithAlreadyPlannedEvent
 
 // for matching all possible users
 var currentLoopNumber = 1
 
 
-var findRandomUniqueUser = function(alreadyFoundUser, callback) {
+var findRandomUniqueUser = function(alreadyFoundUser, excludeUsers, callback) {
     var maxTryCount = 5
 
     var findRandomUser = function(error, userCount, tryCount) {
@@ -18,7 +19,7 @@ var findRandomUniqueUser = function(alreadyFoundUser, callback) {
         }
         debug('%d. try to find unique random user', tryCount)
 
-        models.User.findRandomUser(userCount, function(error, user) {
+        models.User.findRandomUser(userCount, excludeUsers, function(error, user) {
             if ( ! user
                 || alreadyFoundUser && user.id === alreadyFoundUser.id
             ) {
@@ -33,19 +34,19 @@ var findRandomUniqueUser = function(alreadyFoundUser, callback) {
         })
     }
 
-    models.User.countUsers({email: { $ne: config.eventOrganiserEmail}}, findRandomUser)
+    models.User.countUsers({email: { $ne: config.eventOrganiserEmail, $nin: excludeUsers}}, findRandomUser)
 }
 
-var findTwoUniqueUsers = function(mainCallback) {
+var findTwoUniqueUsers = function(excludeUsers, mainCallback) {
     var userOne,
         userTwo
 
     async.waterfall([
-        async.apply(findRandomUniqueUser, null),
+        async.apply(findRandomUniqueUser, null, excludeUsers),
         function(user, callback) {
             debug('trying to find second user')
             userOne = user
-            findRandomUniqueUser(user, callback)
+            findRandomUniqueUser(user, excludeUsers, callback)
         }
     ], function(error, user) {
         if (error) {
@@ -57,10 +58,17 @@ var findTwoUniqueUsers = function(mainCallback) {
         mainCallback(null, userOne, userTwo)
     })
 }
+
+var addUsersToPlannedEvents = function(users) {
+    for (var userIndex in users) {
+        usersWithAlreadyPlannedEvent.push(users[userIndex].email)
+    }
+}
+
 // todo: too many errors checking, is there a better way?
 var matchUsers = function(callback) {
     debug('matching users')
-    providers.Calendar.areUsersFree(function(error, result) {
+    providers.Calendar.areUsersFree(usersWithAlreadyPlannedEvent, function(error, result) {
         currentLoopNumber++;
 
         if (error) {
@@ -71,6 +79,8 @@ var matchUsers = function(callback) {
             if (error) {
                 return callback && callback(error)
             }
+            addUsersToPlannedEvents(result.users)
+
             providers.Calendar.createEventsForAttendees(organiser, result.users, function(error, createEventsResult) {
                 if (error) {
                     return callback && callback(error)
@@ -83,6 +93,7 @@ var matchUsers = function(callback) {
         if (result.areUsersFree) {
             providers.User.findByEmail(config.eventOrganiserEmail, foundOrganiserAccountCallback)
         } else {
+            debug('users are not free')
             return callback && callback()
         }
     })
@@ -91,6 +102,7 @@ var matchUsers = function(callback) {
 var planCoffeeTimeForRandomUsers = function(mainCallback) {
     models.User.countUsers({}, function(error, usersCount) {
         var maxUserLoopMatching = usersCount
+        usersWithAlreadyPlannedEvent = []
 
         async.whilst(
             function() {

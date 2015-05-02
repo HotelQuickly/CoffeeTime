@@ -8,8 +8,8 @@ var debug = require('debug')('coffee:providers:calendar'),
     providers
 
 // todo: define the times from configuration
-var startDateTime = moment().add(2, 'days').hours(9).minutes(0).seconds(0).utcOffset(7),
-    endDateTime = moment().add(2, 'days').hours(9).minutes(30).seconds(0).utcOffset(7)
+var startDateTime = moment().add(1, 'days').hours(15).minutes(0).seconds(0).utcOffset(7),
+    endDateTime = moment().add(1, 'days').hours(15).minutes(30).seconds(0).utcOffset(7)
 
 
 var filterUserCompanyCalendar = function(calendars, userEmail) {
@@ -41,8 +41,6 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
     }
 
     googleCalendar(userAccessToken).freebusy.query(query, {}, function(error, data) {
-        debug('got response about user busyness', userEmail)
-
         if (error) {
             return callback && callback(error)
         }
@@ -62,6 +60,7 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
         var busyTimes = data.calendars[Object.keys(data.calendars)[0]].busy
 
         if (busyTimes.length > 0) {
+            debug('User is busy', userEmail, busyTimes)
             return callback && callback(null, false)
         }
 
@@ -70,7 +69,7 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
             if (error) {
                 return callback && callback(error)
             }
-
+            debug('He has events planned: ', events)
             if (events && events.length > 0) {
                 return callback && callback(null, false)
             } else {
@@ -92,7 +91,7 @@ var isUserFree = function(userId, callback) {
 }
 
 
-var areUsersFree = function(callback) {
+var areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
 
     var matchFoundUsers = function(error, userOne, userTwo) {
         if (error) {
@@ -116,7 +115,7 @@ var areUsersFree = function(callback) {
         })
     }
 
-    providers.User.findTwoUniqueUsers(matchFoundUsers)
+    providers.User.findTwoUniqueUsers(usersWithAlreadyPlannedEvent, matchFoundUsers)
 }
 
 // todo: move this to utils

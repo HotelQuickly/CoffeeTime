@@ -54,13 +54,15 @@ var random = function(count) {
     return Math.floor( Math.random() * count )
 }
 
-var findRandomUser = function(userCount, callback) {
+var findRandomUser = function(userCount, excludeUsers, callback) {
     debug('Trying to find random user from %d users', userCount)
     if ( ! userCount) {
         userCount = 1
     }
 
-    userCollection.find({ email: { $ne: config.eventOrganiserEmail }}).limit(-1).skip(random(userCount)).next(callback)
+    userCollection.find({
+        email: { $ne: config.eventOrganiserEmail, $nin: excludeUsers }
+    }).limit(-1).skip(random(userCount)).next(callback)
 }
 
 var countUsers = function(query, callback) {

@@ -39,7 +39,7 @@ var findPastEvents = function(callback) {
 
 var findFutureEvents = function(callback) {
     eventCollection.find({
-        "start.dateTime": { $gt: new Date}
+        "start.dateTime": { $gt: moment().format()}
     }).toArray(callback)
 }
 
