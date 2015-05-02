@@ -19,6 +19,9 @@ exports.getMethods = function(params) {
     return {
         setProviders: setProviders,
         saveFromGoogleEventInsertData: saveFromGoogleEventInsertData,
-        hasUserPlannedEvent: models.Event.hasUserPlannedEvent
+        hasUserPlannedEvent: models.Event.hasUserPlannedEvent,
+        findAll: models.Event.findAll,
+        findFutureEvents: models.Event.findFutureEvents,
+        findPastEvents: models.Event.findPastEvents
     }
 }

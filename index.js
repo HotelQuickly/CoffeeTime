@@ -12,7 +12,10 @@ var log = logentries.logger({
 
 var express = require('express'),
     http = require('http'),
-    config = require('./config/environment')
+    config = require('./config/environment'),
+    utils = require('./lib/utils')
+
+utils.log = log
 
 var app = express()
 
@@ -21,10 +24,7 @@ require('./config/expressMiddleware')(app, config)
 var params = {
     app: app,
     config: config,
-    utils: {
-        // loggers / helpers / etc
-        log: log
-    }
+    utils: utils
 }
 
 var models = require('./app/models')(params)

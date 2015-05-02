@@ -124,6 +124,7 @@ exports.getMethods = function(params) {
         setProviders: setProviders,
         findTwoUniqueUsers: findTwoUniqueUsers,
         findByEmail: models.User.findByEmail,
+        findAll: models.User.findAll,
         planCoffeeTimeForRandomUsers: planCoffeeTimeForRandomUsers
     }
 }

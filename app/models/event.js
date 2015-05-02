@@ -1,6 +1,7 @@
 'use strict'
 
 var debug = require('debug')('coffee:app:models:event'),
+    moment = require('moment'),
     eventCollection,
     log
 
@@ -26,12 +27,31 @@ var save = function(event, callback) {
     eventCollection.save(event, callback)
 }
 
+var findAll = function(callback) {
+    eventCollection.find({}).toArray(callback)
+}
+
+var findPastEvents = function(callback) {
+    eventCollection.find({
+        "start.dateTime": { $lt: moment().format()}
+    }).toArray(callback)
+}
+
+var findFutureEvents = function(callback) {
+    eventCollection.find({
+        "start.dateTime": { $gt: new Date}
+    }).toArray(callback)
+}
+
 exports.getMethods = function(params, mongoEventCollection) {
     eventCollection = mongoEventCollection
     log = params.utils.log
 
     return {
         hasUserPlannedEvent: hasUserPlannedEvent,
-        save: save
+        save: save,
+        findAll: findAll,
+        findFutureEvents: findFutureEvents,
+        findPastEvents: findPastEvents
     }
 };

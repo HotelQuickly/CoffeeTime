@@ -1,12 +1,17 @@
 'use strict'
 
-var models
+var async = require('async'),
+    utils,
+    providers
 
 var userList = function(request, response) {
-    models.User.findAll(function(err, results) {
+    async.parallel({
+        'users': providers.User.findAll
+    }, function(error, results) {
         var locals = {
-            users: results
+            users: results['users']
         }
+
         response.render('user/list.jade', locals)
     })
 }
@@ -14,7 +19,8 @@ var userList = function(request, response) {
 exports.register = function(params) {
     var app = params.app
     var routeMiddleware = params.routerMiddleware
-    models = params.models
+    providers = params.providers
+    utils = params.utils
 
     app.get('/users/list', routeMiddleware.isAuthenticated, userList)
 }

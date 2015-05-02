@@ -2,18 +2,15 @@ extends ../layout
 block content
    div.container
       div.content
-         h1 Welcome to CoffeeTime!
-         p
-            | Every week, you will receive an invitation for 30 minutes chat with one of your HotelQuickly colleagues to your calendar.
-            |  CoffeeTime will never plan a chat for you if you have something else planned already.
-            |  In the end, the decision to accept or reject the invitation is yours.
-         h3 These people already signed up
-         ul
-            for user in users
-               if user.displayName === ''
-                  li= user.email
-               else
-                  li= user.displayName
+            a(href="/home") << Back to home
+            h3 List of #{users.length} people that signed up
+            ul
+               for user in users
+                  if user.displayName === ''
+                     li= user.email
+                  else
+                     li= user.displayName
+
 
    footer.footer
       div.container

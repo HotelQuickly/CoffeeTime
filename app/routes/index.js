@@ -13,5 +13,6 @@ module.exports = function(params) {
     require('../controllers/auth').register(params)
     require('../controllers/calendar').register(params)
     require('../controllers/user').register(params)
+    require('../controllers/home').register(params)
 
 }

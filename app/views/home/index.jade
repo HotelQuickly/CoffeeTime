@@ -1,0 +1,33 @@
+extends ../layout
+block content
+    div.container
+        div.content
+            h1 Welcome to CoffeeTime!
+            p
+                | Every week, you will receive an invitation for 30 minutes chat with one of your HotelQuickly colleagues to your calendar.
+                |  CoffeeTime will never plan a chat for you if you have something else planned already.
+                |  In the end, the decision to accept or reject the invitation is yours.
+            p
+               | At the moment <strong>#{users.length} people</strong> signed up.&nbsp;
+               a(href="/users/list") See list of all users.
+
+            div.row
+                div.col-md-6
+                    h3 #{pastEvents.length} chats already happened
+                    table.table.table-striped.table-bordered
+                        for event in pastEvents
+                            tr
+                                for attendee in event.attendees
+                                    td= attendee.displayName
+                                td= prettyDate(event.start.dateTime)
+                div.col-md-6
+                    h3 #{futureEvents.length} chats are planned
+                    table.table.table-striped.table-bordered
+                        for event in futureEvents
+                            tr
+                                for attendee in event.attendees
+                                    td= attendee.displayName
+                                td= prettyDate(event.start.dateTime)
+    footer.footer
+        div.container
+            p.text-muted Developed by #[a(href="mailto:josef.nevoral@hotelquickly.com") Josef Nevoral]
