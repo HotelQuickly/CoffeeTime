@@ -1,7 +1,5 @@
 # Coffee Time
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
 An application for connecting people. People can connect their calendar to the app. CoffeeTime then matches 2 people every week based on their free time in calendar and sends them invitation for a talk.
 
 CoffeeTime was developed because our company is growing to the point, where people stop know each other.
