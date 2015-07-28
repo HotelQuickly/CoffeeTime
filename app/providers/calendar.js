@@ -5,7 +5,8 @@ var debug = require('debug')('coffee:providers:calendar'),
     moment = require('moment'),
     config,
     models,
-    providers
+    providers,
+	logger
 
 var getStartDateTime = function() {
 	return moment().add(config.planForDaysInAdvance, 'days').utcOffset(7).hours(15).minutes(0).seconds(0)
@@ -27,7 +28,7 @@ var getListOfCalendars = function(userAccessToken, userData, callback) {
     googleCalendar(userAccessToken).calendarList.list(function(error, calendars) {
         debug('callback after getting list of calendars')
         if (error) {
-			utils.log.err(error)
+			logger.err(error)
             return callback && callback(error)
         }
         callback && callback(null, userAccessToken, userData.email, filterUserCompanyCalendar(calendars.items, userData.email))
@@ -46,7 +47,7 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
 
     googleCalendar(userAccessToken).freebusy.query(query, {}, function(error, data) {
         if (error) {
-			utils.log.err(error)
+			logger.err(error)
             return callback && callback(error)
         }
         /**
@@ -72,7 +73,7 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
         providers.Event.hasUserPlannedEvent(userEmail, getStartDateTime(), getEndDateTime(), function(error, events) {
             debug('got users planned events')
             if (error) {
-				utils.log.err(error)
+				logger.err(error)
                 return callback && callback(error)
             }
             debug('He has events planned: ', events)
@@ -101,7 +102,7 @@ var areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
 
     var matchFoundUsers = function(error, userOne, userTwo) {
         if (error) {
-			utils.log.err(error)
+			logger.err(error)
             return callback && callback(error)
         }
 
@@ -110,7 +111,7 @@ var areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
             userTwoIsFree: async.apply(isUserFree, userTwo.id)
         }, function(error, result) {
             if (error) {
-				utils.log.err(error)
+				logger.err(error)
                 return callback && callback(error)
             }
 
@@ -138,7 +139,7 @@ var createEvent = function(organiserAccessToken, organiserEmail, attendees, star
 
     var event = {
         summary: 'CoffeeTime - chat with a colleague',
-        start: { dateTime: getStartDateTime.format() },
+        start: { dateTime: getStartDateTime().format() },
         end: { dateTime: getEndDateTime().format() },
         attendees: getAttendeesEmails(attendees),
         description: "Let's get to know each other.  We can chat about life, work or favourite coffee.\n\n " +
@@ -148,7 +149,7 @@ var createEvent = function(organiserAccessToken, organiserEmail, attendees, star
 
     googleCalendar(organiserAccessToken).events.insert(organiserEmail, event, function(error, result) {
         if (error) {
-			utils.log.err(error)
+			logger.err(error)
             return callback && callback(error)
         }
 
@@ -165,7 +166,7 @@ var createEventsForAttendees = function(organiserData, attendees, callback) {
 
     providers.Auth.refreshUserAccessToken(organiserData, function(error, organiserAccessToken) {
         if (error) {
-			utils.log.err(error)
+			logger.err(error)
             return callback && callback(error)
         }
         createEvent(organiserAccessToken, organiserData.email, attendees, getStartDateTime(), getEndDateTime(), callback)
@@ -182,6 +183,7 @@ exports.getMethods = function(params) {
     config = params.config
     models = params.models
     providers = params.providers
+	logger = params.utils.log
 
     return {
         setProviders: setProviders,
