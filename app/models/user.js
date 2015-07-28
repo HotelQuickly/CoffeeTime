@@ -2,11 +2,16 @@
 
 var userCollection,
     debug = require('debug')('coffee:models:user'),
+	moment = require('moment'),
     config,
     log
 
 var findAll = function(callback) {
-    userCollection.find({ email: { $ne: config.eventOrganiserEmail }}).sort({'name.familyName': 1}).toArray(function(error, results) {
+	var condition = {
+		email: { $ne: config.eventOrganiserEmail },
+		delFlag: { $ne: 1}
+	}
+    userCollection.find(condition).sort({'name.familyName': 1}).toArray(function(error, results) {
         return callback && callback(null, results)
     })
 }
@@ -61,8 +66,23 @@ var findRandomUser = function(userCount, excludeUsers, callback) {
     }
 
     userCollection.find({
-        email: { $ne: config.eventOrganiserEmail, $nin: excludeUsers }
+        email: { $ne: config.eventOrganiserEmail, $nin: excludeUsers },
+		delFlag: { $ne: 1}
     }).limit(-1).skip(random(userCount)).next(callback)
+}
+
+var deleteUser = function(userId, callback) {
+	var data = {
+		delFlag: 1,
+		deletedAt: moment().format()
+	}
+
+	userCollection.update({id: userId}, { $set: data }, function(error, data) {
+		if (error) {
+			return callback(error)
+		}
+		return callback(null, data);
+	});
 }
 
 var countUsers = function(query, callback) {
@@ -82,6 +102,7 @@ exports.getMethods = function(params, mongoUserCollection) {
         update: userCollection.update,
         findOneAndUpdate: findOneAndUpdate,
         findRandomUser: findRandomUser,
-        countUsers: countUsers
+        countUsers: countUsers,
+		deleteUser: deleteUser
     }
 };

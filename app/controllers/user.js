@@ -9,11 +9,21 @@ var userList = function(request, response) {
         'users': providers.User.findAll
     }, function(error, results) {
         var locals = {
-            users: results['users']
+            users: results['users'],
+			isAdmin: providers.Auth.isAdmin(request.user.email)
         }
 
         response.render('user/list.jade', locals)
     })
+}
+
+var userDelete = function(request, response) {
+	if ( ! providers.Auth.isAdmin(request.user.email)) {
+		return response.render('auth/notAllowed.jade');
+	}
+	providers.User.deleteUser(request.user.id, function(error, result) {
+		return response.redirect('/users/list')
+	})
 }
 
 exports.register = function(params) {
@@ -23,5 +33,6 @@ exports.register = function(params) {
     utils = params.utils
 
     app.get('/users/list', routeMiddleware.isAuthenticated, userList)
+    app.get('/users/:id/delete', routeMiddleware.isAuthenticated, userDelete)
 }
 

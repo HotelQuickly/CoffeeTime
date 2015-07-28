@@ -7,9 +7,14 @@ block content
             ul
                for user in users
                   if user.displayName === ''
-                     li= user.email
+                     li
+                        | user.email
+                        | a(href="/") test
                   else
-                     li= user.displayName
+                     li
+                        | #{user.displayName} &nbsp;
+                        if isAdmin
+                            a(href="/users/#{user.id}/delete") Disable
 
 
    footer.footer

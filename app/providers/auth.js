@@ -74,6 +74,10 @@ var refreshUserAccessToken = function(user, callback) {
     });
 }
 
+var isAdmin = function(email) {
+	return config.admins.indexOf(email) > -1;
+}
+
 var setProviders = function(providerObject) {
     providers = providerObject
 }
@@ -86,6 +90,7 @@ exports.getMethods = function(params) {
     return {
         setProviders: setProviders,
         registerGoogleStrategy: registerGoogleStrategy,
-        refreshUserAccessToken: refreshUserAccessToken
+        refreshUserAccessToken: refreshUserAccessToken,
+		isAdmin: isAdmin
     }
 }

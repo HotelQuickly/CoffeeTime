@@ -9,7 +9,11 @@ module.exports = (function() {
         consumerKey: process.env.GOOGLE_CONSUMER_KEY,
         consumerSecret: process.env.GOOGLE_CONSUMER_SECRET,
         mongoUri: process.env.MONGO_URI,
-        eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL
+        eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL,
+		admins: [
+			'josef.nevoral@hotelquickly.com'
+		],
+		planForDaysInAdvance: process.env.PLAN_FOR_DAYS_IN_ADVANCE || 2
     }
 })()
 

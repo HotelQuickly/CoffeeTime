@@ -123,6 +123,11 @@ var planCoffeeTimeForRandomUsers = function(mainCallback) {
 
 }
 
+var deleteUser = function(userId, callback) {
+	models.User.deleteUser(userId, callback)
+
+};
+
 var setProviders = function(providerObject) {
     providers = providerObject
 }
@@ -137,6 +142,7 @@ exports.getMethods = function(params) {
         findTwoUniqueUsers: findTwoUniqueUsers,
         findByEmail: models.User.findByEmail,
         findAll: models.User.findAll,
-        planCoffeeTimeForRandomUsers: planCoffeeTimeForRandomUsers
+        planCoffeeTimeForRandomUsers: planCoffeeTimeForRandomUsers,
+		deleteUser: deleteUser
     }
 }
