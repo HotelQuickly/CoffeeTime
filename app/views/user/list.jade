@@ -6,13 +6,12 @@ block content
             h3 List of #{users.length} people that signed up
             ul
                for user in users
-                  if user.displayName === ''
-                     li
-                        | user.email
-                        | a(href="/") test
-                  else
-                     li
-                        | #{user.displayName} &nbsp;
+                   li
+                        if user.displayName === ''
+                            | #{user.email}&nbsp;
+                        else
+                            | #{user.displayName}&nbsp;
+
                         if isAdmin
                             a(href="/users/#{user.id}/delete") Disable
 
