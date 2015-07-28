@@ -21,7 +21,7 @@ var userDelete = function(request, response) {
 	if ( ! providers.Auth.isAdmin(request.user.email)) {
 		return response.render('auth/notAllowed.jade');
 	}
-	providers.User.deleteUser(request.user.id, function(error, result) {
+	providers.User.deleteUser(request.param('id'), function(error, result) {
 		return response.redirect('/users/list')
 	})
 }
