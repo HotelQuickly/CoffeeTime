@@ -58,9 +58,11 @@ var refreshUserAccessToken = function(user, callback) {
         return callback && callback(null, user.accessToken, user)
     }
 
-    debug('attempting to refresh user token')
+    debug('attempting to refresh user token', user)
     refresh.requestNewAccessToken('google', user.refreshToken, function(err, accessToken, params) {
-        debug('refreshed user access token')
+        if (!accessToken) {
+            return callback('Refresh failed')
+        }
         models.User.findOneAndUpdate({
                 query: { id: user.id },
                 update: { $set: {

@@ -25,6 +25,10 @@ var filterUserCompanyCalendar = function(calendars, userEmail) {
 var getListOfCalendars = function(userAccessToken, userData, callback) {
     debug('getting list of calendars')
 
+    if (!userAccessToken) {
+        return callback(null, false, null, callback)
+    }
+
     googleCalendar(userAccessToken).calendarList.list(function(error, calendars) {
         debug('callback after getting list of calendars')
         if (error) {
@@ -37,6 +41,10 @@ var getListOfCalendars = function(userAccessToken, userData, callback) {
 
 var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) {
     debug('getting info if user is free')
+
+    if (!userAccessToken) {
+        return callback(null, false)
+    }
 
     var query = {
         timeMin: getStartDateTime(),
@@ -93,6 +101,9 @@ var isUserFree = function(userId, callback) {
         getListOfCalendars,
         getIfUserIsFree
     ], function(error, result) {
+        if (error == 'Refresh failed') {
+            return callback(null, false)
+        }
         callback(error, result)
     })
 }
