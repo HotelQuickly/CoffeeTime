@@ -11,7 +11,8 @@ module.exports = (function() {
         mongoUri: process.env.MONGO_URI,
         eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL,
 		admins: [
-			'josef.nevoral@hotelquickly.com'
+			'josef.nevoral@hotelquickly.com',
+            'travis.byrd@hotelquickly.com'
 		],
 		planForDaysInAdvance: process.env.PLAN_FOR_DAYS_IN_ADVANCE || 2
     }
