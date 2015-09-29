@@ -18,7 +18,8 @@ module.exports = function(app, config) {
     app.use(session({
         secret: config.sessionSecret,
         store: new MongoStore({
-            url: config.mongoUri
+            url: config.mongoUri,
+            collection: 'coffeetime_sessions'
         })
     }));
     app.use(passport.initialize())
