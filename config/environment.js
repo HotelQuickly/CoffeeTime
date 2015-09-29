@@ -1,6 +1,14 @@
 'use strict'
 
 module.exports = (function() {
+    function constructMongoUri() {
+        return 'mongodb://' +
+            process.env.MONGO_USER + ':' + process.env.MONGO_PASSWORD + '@' +
+            process.env.MONGO_ENDPOINT_1 + ':' + process.env.MONGO_PORT + ',' +
+            process.env.MONGO_ENDPOINT_2 + ':' + process.env.MONGO_PORT + ',' +
+            process.env.MONGO_ENDPOINT_3 + ':' + process.env.MONGO_PORT +
+            '/' + process.env.MONGO_DATABASE
+    }
 
     return {
         port: process.env.PORT || 5000,
@@ -8,7 +16,7 @@ module.exports = (function() {
         sessionSecret: process.env.SESSION_SECRET || 'HQ rocks',
         consumerKey: process.env.GOOGLE_CONSUMER_KEY,
         consumerSecret: process.env.GOOGLE_CONSUMER_SECRET,
-        mongoUri: process.env.MONGO_URI,
+        mongoUri: constructMongoUri(),
         eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL,
 		admins: [
 			'josef.nevoral@hotelquickly.com',
