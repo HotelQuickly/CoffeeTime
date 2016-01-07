@@ -14,8 +14,8 @@
   "author": "Josef Nevoral",
   "license": "MIT",
   "engines": {
-    "node": "0.12.2",
-    "npm": "2.7.4"
+    "node": "5.2.0",
+    "npm": "3.3.12"
   },
   "dependencies": {
     "async": "^0.9.0",
