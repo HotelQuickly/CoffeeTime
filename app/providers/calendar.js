@@ -1,28 +1,29 @@
 'use strict'
-var debug = require('debug')('coffee:providers:calendar'),
+const debug = require('debug')('coffee:providers:calendar'),
     googleCalendar = require('google-calendar'),
     async = require('async'),
-    moment = require('moment'),
-    config,
+    moment = require('moment')
+
+let config,
     models,
     providers,
-	logger
+	  logger
 
-var getStartDateTime = function() {
+const getStartDateTime = function() {
 	return moment().add(config.planForDaysInAdvance, 'days').utcOffset(7).hours(15).minutes(0).seconds(0)
 }
 
-var getEndDateTime = function() {
+const getEndDateTime = function() {
 	return moment().add(config.planForDaysInAdvance, 'days').utcOffset(7).hours(15).minutes(30).seconds(0)
 };
 
-var filterUserCompanyCalendar = function(calendars, userEmail) {
+const filterUserCompanyCalendar = function(calendars, userEmail) {
     return calendars.filter(function(item) {
         return item.id === userEmail
     })
 }
 
-var getListOfCalendars = function(userAccessToken, userData, callback) {
+const getListOfCalendars = function(userAccessToken, userData, callback) {
     debug('getting list of calendars')
 
     if (!userAccessToken) {
@@ -39,14 +40,14 @@ var getListOfCalendars = function(userAccessToken, userData, callback) {
     })
 }
 
-var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) {
+const getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) {
     debug('getting info if user is free')
 
     if (!userAccessToken) {
         return callback(null, false)
     }
 
-    var query = {
+    const query = {
         timeMin: getStartDateTime(),
         timeMax: getEndDateTime(),
         timeZone: 'Asia/Bangkok',
@@ -71,7 +72,7 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
          *      ]}
          * }
          */
-        var busyTimes = data.calendars[Object.keys(data.calendars)[0]].busy
+        const busyTimes = data.calendars[Object.keys(data.calendars)[0]].busy
 
         if (busyTimes.length > 0) {
             debug('User is busy', userEmail, busyTimes)
@@ -94,7 +95,7 @@ var getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback) 
     })
 }
 
-var isUserFree = function(userId, callback) {
+const isUserFree = function(userId, callback) {
     async.waterfall([
         async.apply(models.User.findById, userId),
         providers.Auth.refreshUserAccessToken,
@@ -109,9 +110,9 @@ var isUserFree = function(userId, callback) {
 }
 
 
-var areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
+const areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
 
-    var matchFoundUsers = function(error, userOne, userTwo) {
+    const matchFoundUsers = function(error, userOne, userTwo) {
         if (error) {
 			logger.err(error)
             return callback && callback(error)
@@ -126,7 +127,7 @@ var areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
                 return callback && callback(error)
             }
 
-            var returnResult = {
+            const returnResult = {
                 users: [userOne, userTwo],
                 areUsersFree: result.userOneIsFree && result.userTwoIsFree
             }
@@ -139,16 +140,16 @@ var areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
 }
 
 // todo: move this to utils
-var getAttendeesEmails = function(attendees) {
+const getAttendeesEmails = function(attendees) {
     return attendees.map(function(attendee) {
         return { email: attendee.email }
     })
 }
 
-var createEvent = function(organiserAccessToken, organiserEmail, attendees, start, end, callback) {
+const createEvent = function(organiserAccessToken, organiserEmail, attendees, start, end, callback) {
     debug('creating event')
 
-    var event = {
+    const event = {
         summary: 'CoffeeTime - chat with a colleague',
         start: { dateTime: getStartDateTime().format() },
         end: { dateTime: getEndDateTime().format() },
@@ -170,7 +171,7 @@ var createEvent = function(organiserAccessToken, organiserEmail, attendees, star
     })
 }
 
-var createEventsForAttendees = function(organiserData, attendees, callback) {
+const createEventsForAttendees = function(organiserData, attendees, callback) {
     if (attendees.length < 2) {
         callback('There has to be at least 2 attendees for an event')
     }
@@ -186,7 +187,7 @@ var createEventsForAttendees = function(organiserData, attendees, callback) {
 }
 
 
-var setProviders = function(providerObject) {
+const setProviders = function(providerObject) {
     providers = providerObject
 }
 
