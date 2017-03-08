@@ -154,9 +154,7 @@ const createEvent = function(organiserAccessToken, organiserEmail, attendees, st
         start: { dateTime: getStartDateTime().format() },
         end: { dateTime: getEndDateTime().format() },
         attendees: getAttendeesEmails(attendees),
-        description: "Let's get to know each other.  We can chat about life, work or favourite coffee.\n\n " +
-            "During the chat please fill out the other person's profile in Confluence (if it doesn't exist already).\n" +
-            "Example: http://confluence.hotelquickly.com/display/TEAM/Chris+Schalkx"
+        description: "Let's get to know each other. We can chat about life, work or favourite coffee. Important it that we talk."
     }
 
     googleCalendar(organiserAccessToken).events.insert(organiserEmail, event, function(error, result) {
