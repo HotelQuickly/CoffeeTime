@@ -1,13 +1,13 @@
 'use strict'
 
-var debug = require('debug')('coffee:app:models:event'),
-    moment = require('moment'),
-    eventCollection,
+const debug = require('debug')('coffee:app:models:event'),
+    moment = require('moment')
+let eventCollection,
     log
 
-var hasUserPlannedEvent = function(userEmail, startDateTime, endDateTime, callback) {
+const hasUserPlannedEvent = function(userEmail, startDateTime, endDateTime, callback) {
     debug('checking if user has already some event planned')
-    var query = {
+    const query = {
         attendees: {
             $elemMatch: {
                 email: userEmail
@@ -23,28 +23,28 @@ var hasUserPlannedEvent = function(userEmail, startDateTime, endDateTime, callba
     eventCollection.find(query, callback)
 }
 
-var save = function(event, callback) {
+const save = function(event, callback) {
     eventCollection.save(event, callback)
 }
 
-var findAll = function(callback) {
+const findAll = function(callback) {
     eventCollection.find({}).toArray(callback)
 }
 
-var findPastEvents = function(callback) {
+const findPastEvents = function(callback) {
     eventCollection.find({
         "start.dateTime": { $lt: moment().format()}
     }).toArray(callback)
 }
 
-var findFutureEvents = function(callback) {
+const findFutureEvents = function(callback) {
     eventCollection.find({
         "start.dateTime": { $gt: moment().format()}
     }).toArray(callback)
 }
 
-exports.getMethods = function(params, mongoEventCollection) {
-    eventCollection = mongoEventCollection
+exports.getMethods = function(params, connection) {
+    eventCollection = connection.collection('event')
     log = params.utils.log
 
     return {

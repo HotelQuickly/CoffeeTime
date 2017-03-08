@@ -1,24 +1,44 @@
 'use strict'
 
-var mongo = require('mongojs'),
-    debug = require('debug')('coffee:models:index')
+const MongoClient = require('mongodb').MongoClient
+const debug = require('debug')('coffeetime:app:mongo-client')
 
-module.exports = function(params) {
-    debug('initialisation')
+const config = require('../../config/environment')
 
-    var mongoConnection = mongo.connect(params.config.mongoUri)
+let connection = null
+// eslint-disable-next-line no-unused-vars
+let connecting = false
 
-    mongoConnection.on('error', function(error) {
-        debug('database error', error);
-    });
+function getConnection() {
+  if (connection) {
+    return Promise.resolve(connection)
+  }
 
-    mongoConnection.on('ready', function() {
-        debug('database connected');
-    });
+  debug('initialising')
+  connecting = true
+  return MongoClient.connect(config.mongoUri)
+      .then(function (db) {
+        debug('mongo started')
 
-    return {
-        User: require('./user').getMethods(params, mongoConnection.collection('coffeetime_user')),
-        Event: require('./event').getMethods(params, mongoConnection.collection('coffeetime_event'))
-    }
+        connection = db
+        connecting = false
+
+        return connection
+      }).catch((error) => {
+        debug('mongo start failed', error)
+        connecting = false
+        throw error
+      })
 }
 
+module.exports = function(params) {
+  debug('initialisation')
+
+  return getConnection()
+    .then(connection => {
+      return {
+        User: require('./user').getMethods(params, connection),
+        Event: require('./event').getMethods(params, connection)
+      }
+    })
+}

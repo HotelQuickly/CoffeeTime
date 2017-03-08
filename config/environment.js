@@ -18,11 +18,11 @@ module.exports = (function() {
         consumerSecret: process.env.GOOGLE_CONSUMER_SECRET,
         mongoUri: process.env.MONGO_URI,
         eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL,
-		admins: [
-			'josef.nevoral@hotelquickly.com',
-            'travis.byrd@hotelquickly.com'
-		],
-		planForDaysInAdvance: process.env.PLAN_FOR_DAYS_IN_ADVANCE || 2
-    }
+        admins: [
+          'josef.nevoral@hotelquickly.com',
+          'zienab.oliveria@hotelquickly.com'
+        ],
+        planForDaysInAdvance: process.env.PLAN_FOR_DAYS_IN_ADVANCE || 2
+        }
 })()
 
