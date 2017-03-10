@@ -45,15 +45,10 @@ const findOrCreate = function(userData, callback) {
     findById(userData.id, insertOrUpdateUserCallback)
 }
 
-/**
- * For some strange reason mongojs findOneAndUpdate is not working
- */
 const findOneAndUpdate = function(options, callback) {
-    userCollection.update(options.query, options.update, function(error, result) {
-        userCollection.find(options.query, function(error, updatedData) {
-            callback(null, updatedData[0])
-        })
-    })
+  userCollection.findOneAndUpdate(options.query, options.data, {returnOriginal: false, upsert: true}, function(error, result) {
+    callback(null, result.value)
+  })
 }
 
 const random = function(count) {
@@ -67,9 +62,11 @@ const findRandomUser = function(userCount, excludeUsers, callback) {
     }
 
     userCollection.find({
-        email: { $ne: config.eventOrganiserEmail, $nin: excludeUsers },
-		delFlag: { $ne: 1}
-    }).limit(-1).skip(random(userCount)).next(callback)
+      email: { $ne: config.eventOrganiserEmail, $nin: excludeUsers },
+		  delFlag: { $ne: 1}
+    }).limit(-1)
+      .skip(random(userCount))
+      .next(callback)
 }
 
 const deleteUser = function(userId, callback) {

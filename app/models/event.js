@@ -20,7 +20,7 @@ const hasUserPlannedEvent = function(userEmail, startDateTime, endDateTime, call
             dateTime: endDateTime.format()
         }
     }
-    eventCollection.find(query, callback)
+    eventCollection.find(query).toArray(callback)
 }
 
 const save = function(event, callback) {

@@ -65,11 +65,10 @@ var refreshUserAccessToken = function(user, callback) {
         }
         models.User.findOneAndUpdate({
                 query: { id: user.id },
-                update: { $set: {
+                data: { $set: {
                     accessToken: accessToken,
                     accessTokenExpiresIn: moment().add(1, 'hour').format()
-                }},
-                new: true
+                }}
             }, function(error, user) {
                 callback(null, accessToken, user);
         });
