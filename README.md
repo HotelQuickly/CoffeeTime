@@ -54,3 +54,21 @@ Run the app
 nodemon index.js
 ```
 And open `http://localhost:5000/` in your browser
+
+## Usage
+
+Application provides endpoint `/calendar/match`. Setup a cron job to his this URL once a week.
+By default, the meeting is schedule to 3pm GMT+7 for 30 minutes in 2 days when the cron runs. (e.g. if you set the cron to run at 7am every Monday. The meeting will be scheduled to 3pm on Wednesday.
+
+You can change the default schedule time by env variables:
+
+- `UTC_OFFSET` Define the timezone in hours
+- `PLAN_TO_START_HOUR` Hour of when the meeting should start
+- `PLAN_TO_END_HOUR` Hour of when the meeting should end
+- `PLAN_TO_START_MINUTE` Minute of when the meeting should start
+- `PLAN_TO_END_MINUTE` Minute of when the meeting should end
+
+### Master account
+
+You *have to* login with the master account defined in env var `EVENT_ORGANISER_EMAIL` before running matching cron.
+Without login with this account, no meeting can be planned (Because this master account is organiser of each meeting - so that both guests can decline the invitation)
