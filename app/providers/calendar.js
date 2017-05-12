@@ -72,7 +72,7 @@ const getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback
          * data are in format
          * {
          *      calendars: {[
-         *          josef.nevoral@hotelquickly.com: {
+         *          josef.nevoral@gmail.com: {
          *              busy: [
          *                  timeStart: "2015-04-24 17:00:00"
          *                  timeEnd: "2015-04-24 17:30:00"
