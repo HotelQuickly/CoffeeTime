@@ -11,7 +11,8 @@ module.exports = (function() {
         eventOrganiserEmail: process.env.EVENT_ORGANISER_EMAIL,
         admins: [
           'josef.nevoral@hotelquickly.com',
-          'zienab.oliveria@hotelquickly.com'
+          'zienab.oliveria@hotelquickly.com',
+          'omid.fathi@hotelquickly.com'
         ],
         planForDaysInAdvance: process.env.PLAN_FOR_DAYS_IN_ADVANCE || 2,
         utcOffset: process.env.UTC_OFFSET || 7,
