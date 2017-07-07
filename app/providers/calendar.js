@@ -43,7 +43,7 @@ const getListOfCalendars = function(userAccessToken, userData, callback) {
     googleCalendar(userAccessToken).calendarList.list(function(error, calendars) {
         debug('callback after getting list of calendars')
         if (error) {
-			logger.err(error)
+			      logger.err(error)
             return callback && callback(error)
         }
         callback && callback(null, userAccessToken, userData.email, filterUserCompanyCalendar(calendars.items, userData.email))
@@ -66,14 +66,13 @@ const getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback
 
     googleCalendar(userAccessToken).freebusy.query(query, {}, function(error, data) {
         if (error) {
-			logger.err(error)
-            return callback && callback(error)
+			      return getIfUserIsFree(userAccessToken, userEmail, calendars, callback)
         }
         /**
          * data are in format
          * {
          *      calendars: {[
-         *          josef.nevoral@hotelquickly.com: {
+         *          josef.nevoral@gmail.com: {
          *              busy: [
          *                  timeStart: "2015-04-24 17:00:00"
          *                  timeEnd: "2015-04-24 17:30:00"
@@ -92,7 +91,7 @@ const getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback
         providers.Event.hasUserPlannedEvent(userEmail, getStartDateTime(), getEndDateTime(), function(error, events) {
             debug('got users planned events')
             if (error) {
-				logger.err(error)
+				        logger.err(error)
                 return callback && callback(error)
             }
             debug('He has events planned: ', events)
@@ -133,7 +132,7 @@ const areUsersFree = function(usersWithAlreadyPlannedEvent, callback) {
             userTwoIsFree: async.apply(isUserFree, userTwo.id)
         }, function(error, result) {
             if (error) {
-				logger.err(error)
+				        logger.err(error)
                 return callback && callback(error)
             }
 
@@ -169,7 +168,7 @@ const createEvent = function(organiserAccessToken, organiserEmail, attendees, st
 
     googleCalendar(organiserAccessToken).events.insert(organiserEmail, event, function(error, result) {
         if (error) {
-			logger.err(error)
+			      logger.err(error)
             return callback && callback(error)
         }
 
@@ -186,7 +185,7 @@ const createEventsForAttendees = function(organiserData, attendees, callback) {
 
     providers.Auth.refreshUserAccessToken(organiserData, function(error, organiserAccessToken) {
         if (error) {
-			logger.err(error)
+			      logger.err(error)
             return callback && callback(error)
         }
         createEvent(organiserAccessToken, organiserData.email, attendees, getStartDateTime(), getEndDateTime(), callback)
