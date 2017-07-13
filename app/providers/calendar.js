@@ -10,11 +10,21 @@ let config,
 	  logger
 
 const getStartDateTime = function() {
-	return moment().add(config.planForDaysInAdvance, 'days').utcOffset(7).hours(15).minutes(0).seconds(0)
+	return moment()
+    .add(config.planForDaysInAdvance, 'days')
+    .utcOffset(config.utcOffset)
+    .hours(config.planToStartHour)
+    .minutes(config.planToStartMinute)
+    .seconds(0)
 }
 
 const getEndDateTime = function() {
-	return moment().add(config.planForDaysInAdvance, 'days').utcOffset(7).hours(15).minutes(30).seconds(0)
+	return moment()
+    .add(config.planForDaysInAdvance, 'days')
+    .utcOffset(config.utcOffset)
+    .hours(config.planToEndHour)
+    .minutes(config.planToEndMinute)
+    .seconds(0)
 };
 
 const filterUserCompanyCalendar = function(calendars, userEmail) {
@@ -62,7 +72,7 @@ const getIfUserIsFree = function(userAccessToken, userEmail, calendars, callback
          * data are in format
          * {
          *      calendars: {[
-         *          josef.nevoral@hotelquickly.com: {
+         *          josef.nevoral@gmail.com: {
          *              busy: [
          *                  timeStart: "2015-04-24 17:00:00"
          *                  timeEnd: "2015-04-24 17:30:00"
