@@ -12,7 +12,7 @@ module.exports = (function() {
         admins: [
           'josef.nevoral@hotelquickly.com',
           'zienab.oliveria@hotelquickly.com',
-          'omid.fathi@hotelquickly.com'
+          'ashan.perera@hotelquickly.com'
         ],
         planForDaysInAdvance: process.env.PLAN_FOR_DAYS_IN_ADVANCE || 2
         }
